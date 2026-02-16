@@ -14,7 +14,10 @@ export default {
       }
 
       const headers = new Headers();
-      headers.set("Cache-Control", "public, max-age=31536000, immutable");
+      // Disable caching completely for now
+      headers.set("Cache-Control", "no-cache, no-store, must-revalidate");
+      headers.set("Pragma", "no-cache");
+      headers.set("Expires", "0");
 
       if (filename.endsWith(".js.br")) {
         headers.set("Content-Type", "application/javascript");
@@ -38,8 +41,18 @@ export default {
     if (pathname === "/" || pathname === "/index.html") {
       const index = await env.R2.get("index.html");
       if (index) {
-        return new Response(index.body, {
-          headers: { "Content-Type": "text/html" }
+        // Add cache-busting meta tags
+        let html = await index.text();
+        html = html.replace('<head>', `<head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">`);
+        
+        return new Response(html, {
+          headers: { 
+            "Content-Type": "text/html",
+            "Cache-Control": "no-cache, no-store, must-revalidate"
+          }
         });
       }
       return new Response("index.html not found", { status: 404 });
