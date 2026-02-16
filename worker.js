@@ -36,7 +36,7 @@ export default {
       });
     }
 
-    // Serve other static files from R2 (TemplateData, etc)
+    // Serve other static files from R2
     if (pathname.startsWith("/TemplateData/") || 
         pathname.startsWith("/StreamingAssets/") ||
         pathname === "/manifest.webmanifest" ||
@@ -48,27 +48,25 @@ export default {
       if (object) {
         const headers = new Headers();
         headers.set("Content-Type", getContentType(pathname));
+        headers.set("Cache-Control", "no-cache");
         return new Response(object.body, { headers });
       }
       return new Response("Not found", { status: 404 });
     }
 
-    // Serve index.html with ServiceWorker disabled
+    // Serve index.html with "hi" at the bottom
     if (pathname === "/" || pathname === "/index.html") {
       const index = await env.R2.get("index.html");
       if (index) {
         let html = await index.text();
         
-        // Remove ServiceWorker registration and add cache busting
-        html = html.replace(
-          'navigator.serviceWorker.register("ServiceWorker.js");',
-          '// ServiceWorker disabled for cache clearing\n      navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));'
-        );
+        // Add "hi" text at the bottom
+        html = html.replace('</body>', `
+  <div style="position:fixed;bottom:10px;left:10px;color:white;font-family:sans-serif;z-index:9999;">This is only a early beta, and this project is NOT ready at all, there is a few bugs such as, the timer text and the night text does NOT show, and when playing and making your cursor to the left or right, there is a little blue gap, which all of these bugs will be fixed next upd, idk if there is any other bugs, soo uh yea, also dm me on what stuff yall wanted me to add, my tiktok is in the info tab of the game, so yea...</div>
+</body>`);
         
-        // Add cache meta tags
-        html = html.replace('<head>', `<head>
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">`);
+        // Remove original ServiceWorker registration
+        html = html.replace(/if\s*\(\s*"serviceWorker"\s*in\s*navigator\s*\)\s*\{\s*navigator\.serviceWorker\.register\([^)]+\);\s*\}/, '');
         
         return new Response(html, {
           headers: { 
@@ -89,6 +87,6 @@ function getContentType(path) {
   if (path.endsWith('.js')) return 'application/javascript';
   if (path.endsWith('.ico')) return 'image/x-icon';
   if (path.endsWith('.json')) return 'application/json';
-  if (path.endsWith('.manifest')) return 'application/manifest+json';
+  if (path.endsWith('.webmanifest')) return 'application/manifest+json';
   return 'application/octet-stream';
 }
