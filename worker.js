@@ -2,16 +2,28 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const pathname = url.pathname;
+    
+    // Debug: Show what path is being requested
+    if (pathname.includes("framework")) {
+      return new Response(
+        `Worker is running!\nPath: ${pathname}\nR2 binding exists: ${!!env.R2}`, 
+        { headers: { "Content-Type": "text/plain" } }
+      );
+    }
 
-    // Serve Unity build files from R2
+    // Normal handling for other paths
     if (pathname.startsWith("/Build/")) {
       const filename = pathname.split('/').pop();
       const key = "Build/" + filename;
       
+      if (!env.R2) {
+        return new Response("ERROR: R2 binding not found", { status: 500 });
+      }
+      
       const object = await env.R2.get(key);
       
       if (!object) {
-        return new Response("Not found: " + key, { status: 404 });
+        return new Response(`File not found in R2: ${key}`, { status: 404 });
       }
 
       const headers = new Headers();
@@ -28,16 +40,14 @@ export default {
         headers.set("Content-Encoding", "br");
       } else if (filename.endsWith(".loader.js")) {
         headers.set("Content-Type", "application/javascript");
-        // No Content-Encoding - not compressed
       }
 
       return new Response(object.body, {
         headers,
-        encodeBody: "manual"  // Prevents double compression
+        encodeBody: "manual"
       });
     }
 
-    // Serve everything else from public folder
     return env.ASSETS.fetch(request);
   }
 };
