@@ -62,7 +62,7 @@ export default {
         
         // Add "hi" text at the bottom
         html = html.replace('</body>', `
-  <div style="position:fixed;bottom:10px;left:10px;color:white;font-family:sans-serif;z-index:9999;">i fixed everything, so enjoy, and ive heard people selling this link for lots of money so thats nice... also if u want to be a official seller to this link then tell me in class or hallways, idk...</div>
+  <div style="position:fixed;bottom:10px;left:10px;color:gray;font-family:sans-serif;z-index:9999;">i fixed everything, so enjoy, and this was made by AHMED, like the noncholant arab..</div>
 </body>`);
         
         // Remove original ServiceWorker registration
