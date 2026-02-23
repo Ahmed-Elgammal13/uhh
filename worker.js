@@ -62,7 +62,7 @@ export default {
         
         // Add "hi" text at the bottom
         html = html.replace('</body>', `
-  <div style="position:fixed;bottom:10px;left:10px;color:white;font-family:sans-serif;z-index:9999;">This is only a early beta, and this project is NOT ready at all, there is a few bugs such as, the timer text and the night text does NOT show, and when playing and making your cursor to the left or right, there is a little blue gap, which all of these bugs will be fixed next upd, idk if there is any other bugs, soo uh yea, also dm me on what stuff yall wanted me to add, my tiktok is in the info tab of the game, so yea...</div>
+  <div style="position:fixed;bottom:10px;left:10px;color:white;font-family:sans-serif;z-index:9999;">i fixed everything, so enjoy, and ive heard people selling this link for lots of money so thats nice... also if u want to be a official seller to this link then tell me in class or hallways, idk...</div>
 </body>`);
         
         // Remove original ServiceWorker registration
